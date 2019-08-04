@@ -1,5 +1,6 @@
 const express = require('express');
 const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/product');
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
@@ -14,6 +15,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);
@@ -25,7 +27,7 @@ app.use((error, req, res, next) => {
 
 mongoose
     .connect(
-        'mongodb+srv://barbados_1400:thziygHbV0ransdu@nodejscoursemain-iaevk.mongodb.net/mo11-test?retryWrites=true',{ useNewUrlParser: true })
+        'mongodb+srv://barbados_1400:thziygHbV0ransdu@nodejscoursemain-iaevk.mongodb.net/mo11-test?retryWrites=true',{ useNewUrlParser: true })//add to env later
     .then(res => {
         app.listen(3000);
     })

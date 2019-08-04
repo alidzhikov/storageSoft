@@ -37,3 +37,19 @@ exports.signupValidator =  [
         .not()
         .isEmpty()
 ];
+
+exports.createProductValidator = [
+    body('name')
+        .trim()
+        .not()
+        .isEmpty()
+        .isLength({ min: 3 }),
+    body('basePrice')
+        .trim()
+        .not()
+        .isEmpty(),
+    body('creator')
+        .trim()
+     //   .not()
+       // .isEmpty()
+];
