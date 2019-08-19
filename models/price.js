@@ -11,11 +11,11 @@ const priceSchema = new Schema({
         type: Schema.Types.Decimal128,
         required: true
     },
-    customer: {
-        type: Schema.Types.ObjectId,
-        ref: 'Customer',
-        required: true
-    },
+    // customer: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Customer',
+    //     required: true
+    // },
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'User',
