@@ -37,7 +37,7 @@ exports.updateOrder = (req, res, next) => {
     .then(order => {
       errorHelper.isItemFound(order, 'order');
       //errorHelper.isUserAuthorized(req);
-      order.products = products;
+      order.orderProducts = products;
       order.customerID = customerID;
       order.creator = creator;
       return order.save();

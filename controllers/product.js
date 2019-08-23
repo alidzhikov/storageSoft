@@ -32,6 +32,7 @@ exports.updateProduct = (req, res, next) => {
   errorHelper.validationCheck(req);
   const name = req.body.name;
   const basePrice = req.body.basePrice;
+  const size = req.body.size;
   const creator = req.body.creator;
 
   Product.findById(productId)
@@ -40,6 +41,7 @@ exports.updateProduct = (req, res, next) => {
       //errorHelper.isUserAuthorized(req);
       product.name = name;
       product.basePrice = basePrice;
+      product.size = size;
       product.creator = creator;
       return product.save();
     })
@@ -60,6 +62,7 @@ exports.createProduct = (req, res, next) => {
   const newProduct = new Product({
       name: req.body.name,
       basePrice: req.body.basePrice,
+      size: req.body.size,
       creator: req.body.creator
   });
   newProduct

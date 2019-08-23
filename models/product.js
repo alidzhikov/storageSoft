@@ -10,6 +10,10 @@ const productSchema = new Schema({
         type: Schema.Types.Decimal128,
         required: true
     },
+    size: {
+        type: String,
+        reqired: false
+    },
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'User',
