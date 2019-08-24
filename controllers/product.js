@@ -1,13 +1,16 @@
 const Product = require('../models/product');
 const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
+const mongoose = require('mongoose');
+const Decimal128 = mongoose.Types.Decimal128;
 
 exports.getAllProducts = (req, res, next) => {
     Product.find()
     .then(result => {
-        res
+      const products = result.map(product => product.toJSON());
+      res
         .status(200)
-        .json({ message: 'All products.', products: result });
+        .json({ message: 'All products.', products: products });
     })
     .catch(err => {
         next(err);
@@ -18,8 +21,9 @@ exports.getProduct = (req, res, next) => {
   const productId = req.params.productId;
   Product.findById(productId)
     .then(product => {
+      product.basePrice = product.basePrice.toString();
       errorHelper.isItemFound(product, 'product');
-      res.status(200).json({ message: 'Product fetched.', product: product });
+      res.status(200).json({ message: 'Product fetched.', product: product.toJSON() });
     })
     .catch(err => {
       next(err);
@@ -31,7 +35,7 @@ exports.updateProduct = (req, res, next) => {
   const productId = req.params.productId;
   errorHelper.validationCheck(req);
   const name = req.body.name;
-  const basePrice = req.body.basePrice;
+  const basePrice = new Decimal128.fromString(req.body.basePrice);
   const size = req.body.size;
   const creator = req.body.creator;
 
@@ -61,7 +65,7 @@ exports.createProduct = (req, res, next) => {
   console.log(req.body);
   const newProduct = new Product({
       name: req.body.name,
-      basePrice: req.body.basePrice,
+      basePrice: new Decimal128.fromString(req.body.basePrice),
       size: req.body.size,
       creator: req.body.creator
   });

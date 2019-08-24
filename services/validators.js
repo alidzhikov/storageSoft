@@ -43,7 +43,7 @@ exports.createProductValidator = [
         .trim()
         .not()
         .isEmpty()
-        .isLength({ min: 3 }),
+        .isLength({ min: 2 }),
     body('basePrice')
         .trim()
         .not()

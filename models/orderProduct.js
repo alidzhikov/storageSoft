@@ -19,4 +19,11 @@ const orderProductSchema = new Schema({
     {timestamps:true }
 );
 
+orderSchema.set('toJSON', {
+    transform: (doc, ret) => {
+      ret.price = ret.price.toString();
+      return ret;
+    },
+});
+
 module.exports = mongoose.model('OrderProduct', orderProductSchema);

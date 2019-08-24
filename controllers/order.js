@@ -1,13 +1,16 @@
 const Order = require('../models/order');
 const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
+const mongoose = require('mongoose');
+const Decimal128 = mongoose.Types.Decimal128;
 
 exports.getAllOrders = (req, res, next) => {
     Order.find()
     .then(result => {
+      const orders = result.map(order => order.toJSON());
         res
         .status(200)
-        .json({ message: 'All orders.', orders: result });
+        .json({ message: 'All orders.', orders: orders });
     })
     .catch(err => {
         next(err);
@@ -19,7 +22,7 @@ exports.getOrder = (req, res, next) => {
   Order.findById(orderId)
     .then(order => {
       errorHelper.isItemFound(order, 'order');
-      res.status(200).json({ message: 'Order fetched.', order: order });
+      res.status(200).json({ message: 'Order fetched.', order: order.toJSON() });
     })
     .catch(err => {
       next(err);
@@ -29,7 +32,11 @@ exports.getOrder = (req, res, next) => {
 exports.updateOrder = (req, res, next) => { 
   const orderId = req.params.orderId;
   errorHelper.validationCheck(req);
-  const products = req.body.products;
+  const orderProducts = req.body.orderProducts.map(oProd => {
+    oProd.price = new Decimal128.fromString(oProd.price);
+    oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
+    return oProd;
+  });
   const customerID = req.body.customerID;
   const creator = req.body.creator;
 
@@ -37,7 +44,7 @@ exports.updateOrder = (req, res, next) => {
     .then(order => {
       errorHelper.isItemFound(order, 'order');
       //errorHelper.isUserAuthorized(req);
-      order.orderProducts = products;
+      order.orderProducts = orderProducts;
       order.customerID = customerID;
       order.creator = creator;
       return order.save();
@@ -56,10 +63,15 @@ exports.updateOrder = (req, res, next) => {
 exports.createOrder = (req, res, next) => {
   errorHelper.validationCheck(req);
   const newOrder = new Order({
-    products: req.body.products,
+    orderProducts: req.body.orderProducts.map(oProd => {
+      oProd.price = new Decimal128.fromString(oProd.price);
+      oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
+      return oProd;
+    }),
     customerID: req.body.customerID,
     creator: req.body.creator,
   });
+  console.log(newOrder.orderProducts);
   newOrder
       .save()
       .then(order => {

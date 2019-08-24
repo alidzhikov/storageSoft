@@ -23,4 +23,11 @@ const productSchema = new Schema({
     {timestamps:true }
 );
 
+productSchema.set('toJSON', {
+    transform: (doc, ret) => {
+      ret.basePrice = ret.basePrice.toString();
+      return ret;
+    },
+});
+  
 module.exports = mongoose.model('Product', productSchema);

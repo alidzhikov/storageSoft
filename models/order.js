@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const OrderProductSchema = './orderProduct';
 
 const orderSchema = new Schema({
-    products: [OrderProductSchema],
+    orderProducts: [OrderProductSchema],
     customerID: {
         type: Schema.Types.ObjectId,
         required: true
