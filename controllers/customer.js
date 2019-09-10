@@ -31,14 +31,22 @@ exports.updateCustomer = (req, res, next) => {
   errorHelper.validationCheck(req);
   const fName = req.body.fName;
   const lName = req.body.lName;
+  const companyName= req.body.companyName;
+  const address = req.body.address;
+  const vat = req.body.vat;
+  const phoneNumber = req.body.phoneNumber; 
   const creator = req.body.creator;
-
+console.log(req.body);
   Customer.findById(customerId)
     .then(customer => {
       errorHelper.isItemFound(customer, 'customer');
       //errorHelper.isUserAuthorized(req);
       customer.fName = fName;
       customer.lName = lName;
+      customer.companyName = companyName;
+      customer.address = address;
+      customer.vat = vat;
+      customer.phoneNumber = phoneNumber;
       customer.creator = creator;
       return customer.save();
     })
@@ -58,6 +66,10 @@ exports.createCustomer = (req, res, next) => {
   const newCustomer = new Customer({
     fName: req.body.fName,
     lName: req.body.lName,
+    companyName: req.body.companyName,
+    address: req.body.address,
+    vat: req.body.vat,
+    phoneNumber: req.body.phoneNumber,
     creator: req.body.creator
   });
   newCustomer

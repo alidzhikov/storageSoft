@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const productSchema = './product';
+const productSchema = require('./product').productSchema;
 
 const orderProductSchema = new Schema({
     product: {
@@ -19,11 +19,11 @@ const orderProductSchema = new Schema({
     {timestamps:true }
 );
 
-orderSchema.set('toJSON', {
+orderProductSchema.set('toJSON', {
     transform: (doc, ret) => {
       ret.price = ret.price.toString();
       return ret;
     },
 });
 
-module.exports = mongoose.model('OrderProduct', orderProductSchema);
+module.exports = orderProductSchema;

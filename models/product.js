@@ -29,5 +29,5 @@ productSchema.set('toJSON', {
       return ret;
     },
 });
-  
-module.exports = mongoose.model('Product', productSchema);
+exports.Product = mongoose.model('Product', productSchema);
+exports.productSchema = productSchema;

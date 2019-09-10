@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const AddressSchema = require('./address');
 
 const userSchema = new Schema({
     email:{
@@ -18,9 +19,15 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    orgName:{
+    companyName: {
         type: String,
-        required: true
+    },
+    address: AddressSchema,
+    phoneNumber: {
+        type: String,
+    },
+    vat: {
+        type: String,
     },
     phoneNumber: {
         type: String,

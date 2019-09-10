@@ -8,8 +8,10 @@ exports.signup = (req, res, next) => {
     const email = req.body.email;
     const fName = req.body.fName;
     const lName = req.body.lName;
-    const orgName = req.body.orgName;
-    const mobilePhone = req.body.mobilePhone;
+    const companyName = req.body.companyName;
+    const phoneNumber = req.body.phoneNumber;
+    const address = req.body.address;
+    const vat = req.body.vat;
     const password = req.body.password;
     bcrypt.hash(password, 12)
     .then(hashedPsw => {
@@ -18,8 +20,10 @@ exports.signup = (req, res, next) => {
             password: hashedPsw,
             fName: fName,
             lName: lName,
-            orgName: orgName,
-            mobilePhone: mobilePhone,
+            companyName: companyName,
+            phoneNumber: phoneNumber,
+            address: address,
+            vat: vat
         });
         return user.save();
     })

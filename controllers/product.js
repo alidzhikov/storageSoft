@@ -1,4 +1,4 @@
-const Product = require('../models/product');
+const Product = require('../models/product').Product;
 const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
 const mongoose = require('mongoose');

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const PriceSchema = './price';
+const PriceSchema = require('./price');
+const AddressSchema = require('./address');
 
 const customerSchema = new Schema({
     fName: {
@@ -10,6 +11,16 @@ const customerSchema = new Schema({
     lName: {
         type: String,
         required: true
+    },
+    companyName: {
+        type: String,
+    },
+    address: AddressSchema,
+    phoneNumber: {
+        type: String,
+    },
+    vat: {
+        type: String,
     },
     creator: {
         type: Schema.Types.ObjectId,

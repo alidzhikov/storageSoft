@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const OrderProductSchema = './orderProduct';
+const OrderProductSchema = require('./orderProduct');
 
 const orderSchema = new Schema({
-    orderProducts: [OrderProductSchema],
+    orderProducts: {
+        type: [OrderProductSchema]
+    },
     customerID: {
         type: Schema.Types.ObjectId,
         required: true
