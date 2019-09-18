@@ -33,8 +33,10 @@ app.use((error, req, res, next) => {
 
 mongoose
     .connect(
-        'mongodb+srv://barbados_1400:thziygHbV0ransdu@nodejscoursemain-iaevk.mongodb.net/mo11-test?retryWrites=true',{ useNewUrlParser: true })//add to env later
+        `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@nodejscoursemain-iaevk.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true`,
+        { useNewUrlParser: true }
+    )
     .then(res => {
-        app.listen(3000);
+        app.listen(process.env.PORT || 3000);
     })
     .catch(err => console.log(err));
