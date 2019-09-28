@@ -39,7 +39,7 @@ exports.updateOrder = (req, res, next) => {
   });
   const customerID = req.body.customerID;
   const creator = req.body.creator;
-
+  const paidAmount = req.body.paidAmount ? req.body.paidAmount : 0;
   Order.findById(orderId)
     .then(order => {
       errorHelper.isItemFound(order, 'order');
@@ -47,6 +47,7 @@ exports.updateOrder = (req, res, next) => {
       order.orderProducts = orderProducts;
       order.customerID = customerID;
       order.creator = creator;
+      order.paidAmount = new Decimal128.fromString(paidAmount);
       return order.save();
     })
     .then(result => {
@@ -62,6 +63,7 @@ exports.updateOrder = (req, res, next) => {
 
 exports.createOrder = (req, res, next) => {
   errorHelper.validationCheck(req);
+  const paidAmount = req.body.paidAmount ? req.body.paidAmount : 0;
   const newOrder = new Order({
     orderProducts: req.body.orderProducts.map(oProd => {
       oProd.price = new Decimal128.fromString(oProd.price);
@@ -70,8 +72,8 @@ exports.createOrder = (req, res, next) => {
     }),
     customerID: req.body.customerID,
     creator: req.body.creator,
+    paidAmount: new Decimal128.fromString(paidAmount)
   });
-  console.log(newOrder.orderProducts);
   newOrder
       .save()
       .then(order => {
@@ -101,7 +103,6 @@ exports.deleteOrder = (req, res, next) => {
       if(user){
         return user.save();
       }
-
     })
     .then(result => {
       res.status(200).json({ message: 'Deleted order.', orderID: orderId });

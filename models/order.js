@@ -15,6 +15,9 @@ const orderSchema = new Schema({
         ref: 'User',
         required: true
     },
+    paidAmount: {
+        type: Schema.Types.Decimal128
+    }
 },
     {timestamps:true }
 );
@@ -26,6 +29,7 @@ orderSchema.set('toJSON', {
           orPr.product.basePrice = orPr.product.basePrice.toString();
           return orPr;
       });
+      ret.paidAmount = ret.paidAmount ? ret.paidAmount.toString() : 0;
       return ret;
     },
 });
