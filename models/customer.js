@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const PriceSchema = require('./price');
+const PriceSchema = require('./price').PriceSchema;
 const AddressSchema = require('./address');
 
 const customerSchema = new Schema({
@@ -27,7 +27,7 @@ const customerSchema = new Schema({
         ref: 'User',
         required: true
     },
-    prices: [PriceSchema]
+    prices: PriceSchema
 },
     {timestamps:true }
 );

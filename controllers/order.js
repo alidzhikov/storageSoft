@@ -1,4 +1,6 @@
 const Order = require('../models/order');
+const Customer = require('../models/customer');
+const Price = require('../models/price').Price;
 const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
 const mongoose = require('mongoose');
@@ -63,7 +65,6 @@ exports.updateOrder = (req, res, next) => {
 
 exports.createOrder = (req, res, next) => {
   errorHelper.validationCheck(req);
-  const paidAmount = req.body.paidAmount ? req.body.paidAmount : 0;
   const newOrder = new Order({
     orderProducts: req.body.orderProducts.map(oProd => {
       oProd.price = new Decimal128.fromString(oProd.price);
@@ -72,18 +73,37 @@ exports.createOrder = (req, res, next) => {
     }),
     customerID: req.body.customerID,
     creator: req.body.creator,
-    paidAmount: new Decimal128.fromString(paidAmount)
+    paidAmount: new Decimal128.fromString((req.body.paidAmount ? req.body.paidAmount : 0).toString())
   });
+
   newOrder
-      .save()
-      .then(order => {
-          res
-              .status(201)
-              .json({ message: 'Order created successfully', order: order });
-      })
-      .catch(err => {
-          next(err);
-      });
+    .save()
+    .then(order => {
+      Customer.findById(order.customerID)
+        .then(customer => {
+          errorHelper.isItemFound(customer, 'customer');
+          order.orderProducts.forEach(orderProduct => {
+            if (customer.prices.find(price => price.productId == orderProduct.product._id)) return;
+            customer.prices.push(
+              new Price({
+                productId: orderProduct.product._id,
+                price: orderProduct.price,
+                creator: order.creator
+              })
+            );
+          });
+          customer.save();
+        });
+      return order;
+    })
+    .then(order => {
+      res
+        .status(201)
+        .json({ message: 'Order created successfully', order: order });
+    })
+    .catch(err => {
+      next(err);
+    });
 };
 
 exports.deleteOrder = (req, res, next) => {

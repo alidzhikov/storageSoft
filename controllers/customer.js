@@ -36,7 +36,7 @@ exports.updateCustomer = (req, res, next) => {
   const vat = req.body.vat;
   const phoneNumber = req.body.phoneNumber; 
   const creator = req.body.creator;
-console.log(req.body);
+  console.log(req.body);
   Customer.findById(customerId)
     .then(customer => {
       errorHelper.isItemFound(customer, 'customer');
