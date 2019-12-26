@@ -3,7 +3,7 @@ const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
 
 exports.getAllCustomers = (req, res, next) => {
-    Customer.find()
+    Customer.find({}, '-prices')
     .then(result => {
         res
         .status(200)

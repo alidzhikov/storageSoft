@@ -27,9 +27,19 @@ const customerSchema = new Schema({
         ref: 'User',
         required: true
     },
-    prices: PriceSchema
+    prices: [PriceSchema]
 },
     {timestamps:true }
 );
-
+customerSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        if(ret.prices){
+            ret.prices = ret.prices.map(price => {
+                price.price = price.price.toString();
+                return price;
+            });
+        }
+      return ret;
+    },
+});
 module.exports = mongoose.model('Customer', customerSchema);

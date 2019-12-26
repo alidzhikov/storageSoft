@@ -53,6 +53,7 @@ exports.updateOrder = (req, res, next) => {
       return order.save();
     })
     .then(result => {
+      updateCustomerPrices(result);
       res.status(200).json({ message: 'Order updated!', order: result });
     })
     .catch(err => {
@@ -79,21 +80,7 @@ exports.createOrder = (req, res, next) => {
   newOrder
     .save()
     .then(order => {
-      Customer.findById(order.customerID)
-        .then(customer => {
-          errorHelper.isItemFound(customer, 'customer');
-          order.orderProducts.forEach(orderProduct => {
-            if (customer.prices.find(price => price.productId == orderProduct.product._id)) return;
-            customer.prices.push(
-              new Price({
-                productId: orderProduct.product._id,
-                price: orderProduct.price,
-                creator: order.creator
-              })
-            );
-          });
-          customer.save();
-        });
+      updateCustomerPrices(order);
       return order;
     })
     .then(order => {
@@ -134,3 +121,27 @@ exports.deleteOrder = (req, res, next) => {
       next(err);
     });
 };
+
+updateCustomerPrices = order => {
+  Customer.findById(order.customerID)
+    .then(customer => {
+      errorHelper.isItemFound(customer, 'customer');
+      if (!customer.prices)
+        customer.prices = [];
+      order.orderProducts.forEach(orderProduct => {
+        const priceObj = new Price({
+          productId: orderProduct.product._id,
+          price: orderProduct.price,
+          creator: order.creator
+        });
+        const existingPriceForProduct = customer.prices.findIndex(existingPrice => priceObj.productId.toString() === existingPrice.productId.toString());
+        if (existingPriceForProduct === -1) {
+          if(orderProduct.price.toString() !== orderProduct.product.basePrice.toString())
+            customer.prices.push(priceObj);
+        } else if(customer.prices[existingPriceForProduct].price.toString() !== priceObj.price.toString()){         
+          customer.prices[existingPriceForProduct] = priceObj;
+        }
+      });
+      customer.save();
+    });
+}
