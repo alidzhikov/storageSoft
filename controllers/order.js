@@ -42,6 +42,7 @@ exports.updateOrder = (req, res, next) => {
   const customerID = req.body.customerID;
   const creator = req.body.creator;
   const paidAmount = req.body.paidAmount ? req.body.paidAmount : 0;
+  const orderedAt = req.body.orderedAt;
   Order.findById(orderId)
     .then(order => {
       errorHelper.isItemFound(order, 'order');
@@ -50,6 +51,7 @@ exports.updateOrder = (req, res, next) => {
       order.customerID = customerID;
       order.creator = creator;
       order.paidAmount = new Decimal128.fromString(paidAmount);
+      order.orderedAt = orderedAt;
       return order.save();
     })
     .then(result => {
@@ -67,14 +69,15 @@ exports.updateOrder = (req, res, next) => {
 exports.createOrder = (req, res, next) => {
   errorHelper.validationCheck(req);
   const newOrder = new Order({
-    orderProducts: req.body.orderProducts.map(oProd => {
-      oProd.price = new Decimal128.fromString(oProd.price);
-      oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
-      return oProd;
-    }),
+      orderProducts: req.body.orderProducts.map(oProd => {
+        oProd.price = new Decimal128.fromString(oProd.price);
+        oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
+        return oProd;
+      }),
     customerID: req.body.customerID,
     creator: req.body.creator,
-    paidAmount: new Decimal128.fromString((req.body.paidAmount ? req.body.paidAmount : 0).toString())
+    paidAmount: new Decimal128.fromString((req.body.paidAmount ? req.body.paidAmount : 0).toString()),
+    orderedAt: req.body.orderedAt 
   });
 
   newOrder

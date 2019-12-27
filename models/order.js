@@ -17,6 +17,9 @@ const orderSchema = new Schema({
     },
     paidAmount: {
         type: Schema.Types.Decimal128
+    },
+    orderedAt: {
+        type: Schema.Types.Date
     }
 },
     {timestamps:true }
