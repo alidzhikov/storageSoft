@@ -3,6 +3,7 @@ const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
 const mongoose = require('mongoose');
 const Product = require('../models/product').Product;
+const Order = require('../models/order');
 
 exports.getAllStocks = (req, res, next) => {
   Stock.find()
@@ -26,6 +27,32 @@ exports.getStock = (req, res, next) => {
     })
     .catch(err => {
       next(err);
+    });
+};
+
+exports.getProductOrders = (req, res, next) => {
+  Product.find()
+    .then(products => products.map(product => new Stock({product: product, amount: 0, creator: product.creator})))
+    .then(orderedStocks => {
+      Order.find({}, 'orderProducts')
+        .then(orders => {
+          orders.forEach(order => 
+            order.orderProducts.forEach(orderProd => {
+              const index = orderedStocks.findIndex(ordStock => ordStock.product._id.toString() === orderProd.product._id.toString());
+              if (index !== -1)
+                orderedStocks[index].amount += orderProd.qty;
+            })
+          );
+          res
+            .status(200)
+            .json({ message: 'Ordered items amount.', orderedStocks: orderedStocks });
+          })
+        .catch(err => {
+          next(err);
+        });
+    })
+    .catch(err => {
+        next(err);
     });
 };
 

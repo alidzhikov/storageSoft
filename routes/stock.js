@@ -8,6 +8,12 @@ router.get(
     '/',
     stockController.getAllStocks
 );
+
+router.get(
+    '/productsOrdered',
+    stockController.getProductOrders
+);
+
 router.get(
     '/:stockId',
     stockController.getStock
