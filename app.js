@@ -4,6 +4,7 @@ const productRoutes = require('./routes/product');
 const customerRoutes = require('./routes/customer');
 const orderRoutes = require('./routes/order');
 const stockRoutes = require('./routes/stock');
+const stockroomRoutes = require('./routes/stockroom');
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
@@ -22,6 +23,7 @@ app.use('/products', productRoutes);
 app.use('/customers', customerRoutes);
 app.use('/orders', orderRoutes);
 app.use('/stocks', stockRoutes);
+app.use('/stockrooms', stockroomRoutes);
 
 app.use((error, req, res, next) => {
     console.log(error);

@@ -13,6 +13,11 @@ const stockSchema = new Schema({
     sold: {
         type: Number
     },
+    stockroom: {
+        type: Schema.Types.ObjectId,
+        ref: 'Stockroom',
+        required: false
+    },
     creator: {
         type: Schema.Types.ObjectId,
         ref: 'User',

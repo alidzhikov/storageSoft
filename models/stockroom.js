@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const stockRoomSchema = new Schema({
+const stockroomSchema = new Schema({
     name: {
         type: String,
         required: true
     },
+    description: {
+        type: String,
+    },
     address: {
         type: String,
     },
-    isDefault:{
+    isDefault: {
         type: Boolean,
         default: false
     },
@@ -19,7 +22,7 @@ const stockRoomSchema = new Schema({
         required: true
     }
 },
-    {timestamps:true }
+    { timestamps: true }
 );
 
-module.exports = mongoose.model('StockRoom', stockRoomSchema);
+exports.Stockroom = mongoose.model('Stockroom', stockroomSchema);

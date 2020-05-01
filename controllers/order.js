@@ -8,6 +8,7 @@ const Decimal128 = mongoose.Types.Decimal128;
 
 exports.getAllOrders = (req, res, next) => {
     Order.find()
+    .populate('orderProducts.stockroom', '_id name')
     .then(result => {
       const orders = result.map(order => order.toJSON());
         res
@@ -22,6 +23,7 @@ exports.getAllOrders = (req, res, next) => {
 exports.getOrder = (req, res, next) => {
   const orderId = req.params.orderId;
   Order.findById(orderId)
+    .populate('orderProducts.stockroom', '_id name')
     .then(order => {
       errorHelper.isItemFound(order, 'order');
       res.status(200).json({ message: 'Order fetched.', order: order.toJSON() });
@@ -37,6 +39,7 @@ exports.updateOrder = (req, res, next) => {
   const orderProducts = req.body.orderProducts.map(oProd => {
     oProd.price = new Decimal128.fromString(oProd.price);
     oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
+    oProd.stockroom = oProd.stockroom._id;
     return oProd;
   });
   const customerID = req.body.customerID;
@@ -68,10 +71,12 @@ exports.updateOrder = (req, res, next) => {
 
 exports.createOrder = (req, res, next) => {
   errorHelper.validationCheck(req);
+  console.log(req.body.orderProducts)
   const newOrder = new Order({
       orderProducts: req.body.orderProducts.map(oProd => {
         oProd.price = new Decimal128.fromString(oProd.price);
         oProd.product.basePrice = new Decimal128.fromString(oProd.product.basePrice);
+        //oProd.stockroom = oProd.stockroom._id;
         return oProd;
       }),
     customerID: req.body.customerID,

@@ -14,6 +14,11 @@ const orderProductSchema = new Schema({
     qty: {
         type: Number,
         reqired: true
+    },
+    stockroom: {
+        type: Schema.Types.ObjectId,
+        ref: 'Stockroom',
+        required: true
     }
 },
     {timestamps:true }

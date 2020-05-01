@@ -1,80 +1,55 @@
-const Stock = require('../models/stock').Stock;
+const Stockroom = require('../models/stockroom').Stockroom;
 const User = require('../models/user');
 const errorHelper = require('../services/error-helper');
-const mongoose = require('mongoose');
-const Product = require('../models/product').Product;
-const Order = require('../models/order');
 
-exports.getAllStocks = (req, res, next) => {
-  Stock.find()
-    .populate('product')
+exports.getAllStockrooms = (req, res, next) => {
+  Stockroom.find()
     .then(result => {
       res
         .status(200)
-        .json({ message: 'All stocks.', stocks: result });
+        .json({ message: 'All stockrooms.', stockrooms: result });
     })
     .catch(err => {
       next(err);
     });
 };
 
-exports.getStock = (req, res, next) => {
-  const stockId = req.params.stockId;
-  Stock.findById(stockId)
-    .then(stock => {
-      errorHelper.isItemFound(stock, 'stock');
-      res.status(200).json({ message: 'Stock fetched.', stock: stock });
+exports.getStockroom = (req, res, next) => {
+  const stockroomId = req.params.stockroomId;
+  Stockroom.findById(stockroomId)
+    .then(stockroom => {
+      errorHelper.isItemFound(stockroom, 'stockroom');
+      res.status(200).json({ message: 'Stockroom fetched.', stockroom: stockroom });
     })
     .catch(err => {
       next(err);
     });
 };
 
-exports.getProductOrders = (req, res, next) => {
-  Product.find()
-    .then(products => products.map(product => new Stock({product: product, amount: 0, creator: product.creator})))
-    .then(orderedStocks => {
-      Order.find({}, 'orderProducts')
-        .then(orders => {
-          orders.forEach(order => 
-            order.orderProducts.forEach(orderProd => {
-              const index = orderedStocks.findIndex(ordStock => ordStock.product._id.toString() === orderProd.product._id.toString());
-              if (index !== -1)
-                orderedStocks[index].amount += orderProd.qty;
-            })
-          );
-          res
-            .status(200)
-            .json({ message: 'Ordered items amount.', orderedStocks: orderedStocks });
-          })
-        .catch(err => {
-          next(err);
-        });
-    })
-    .catch(err => {
-        next(err);
-    });
-};
-
-exports.updateStock = (req, res, next) => {
+exports.updateStockroom = (req, res, next) => {
   console.log(req.body);
-  const stockId = req.params.stockId;
+  const stockroomId = req.params.stockroomId;
   errorHelper.validationCheck(req);
-  const product = req.body.product;
-  const amount = req.body.amount;
+  const name = req.body.name;
+  const description = req.body.description;
+  const address = req.body.address;
+  const isDefault = req.body.isDefault;
   const creator = req.body.creator;
 
-  Stock.findById(stockId)
-    .then(stock => {
-      errorHelper.isItemFound(stock, 'stock');
+  Stockroom.findById(stockroomId)
+    .then(stockroom => {
+      errorHelper.isItemFound(stockroom, 'stockroom');
       //errorHelper.isUserAuthorized(req);
-      stock.product = product;
-      stock.amount = amount;
-      stock.creator = creator;
-      return stock.save();
+      stockroom.name = name;
+      stockroom.description = description;
+      stockroom.address = address;
+      stockroom.isDefault = isDefault;
+      stockroom.creator = creator;
+      return stockroom.save();
     })
+    .then(unsetOldDefaultStockroom)
     .then(result => {
-      res.status(200).json({ message: 'Stock updated!', stock: result });
+      res.status(200).json({ message: 'Stockroom updated!', stockroom: result });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -84,48 +59,55 @@ exports.updateStock = (req, res, next) => {
     });
 };
 
-exports.createStock = (req, res, next) => {
+exports.createStockroom = (req, res, next) => {
   errorHelper.validationCheck(req);
   console.log(req.body);
-  const newStock = new Stock({
-      product: req.body.product,
-      amount: req.body.amount,
-      creator: req.body.creator
+  const newStockroom = new Stockroom({
+    name: req.body.name,
+    description: req.body.description,
+    address: req.body.address,
+    isDefault: req.body.isDefault,
+    creator: req.body.creator
   });
-  newStock
-      .save()
-      .then(stock => {
-          console.log(stock);
-          res
-              .status(201)
-              .json({ message: 'Stock created successfully', stock: stock });
-      })
-      .catch(err => {
-          next(err);
-      });
+  console.log(newStockroom);
+  newStockroom
+    .save()
+    .then(unsetOldDefaultStockroom)
+    .then(result => {
+      console.log(result);
+      res
+        .status(201)
+        .json({
+          message: 'Stockroom created successfully' + result.oldDefaultStockroom ? ' and is now the default stockroom' : '',
+          stockroom: result
+        });
+    })
+    .catch(err => {
+      next(err);
+    });
 };
 
-exports.deleteStock = (req, res, next) => {
-  const stockId = req.params.stockId;
-  Stock.findById(stockId)
-    .then(stock => {
-      errorHelper.isItemFound(stock, 'stock');
+exports.deleteStockroom = (req, res, next) => {
+  const stockroomId = req.params.stockroomId;
+  Stockroom.findById(stockroomId)
+    .then(stockroom => {
+      errorHelper.isItemFound(stockroom, 'stockroom');
      // errorHelper.isUserAuthorized(req);
-      return Stock.findByIdAndDelete(stockId);
+      return Stockroom.findByIdAndDelete(stockroomId);
     })
     .then(result => {
       return User.findById(req.userId);
     })
     .then(user => {
       // #todo
-      // user.stocks.pull(stockId); 
-      if(user){
+      // DELETE STOCKS IN THIS STOCKROOM
+      // user.stockrooms.pull(stockId); 
+      if (user) {
         return user.save();
       }
-
     })
     .then(result => {
-      res.status(200).json({ message: 'Deleted stock.', stockID: stockId });
+      res.status(200).json({ message: 'Deleted stockroom.', stockroomID: stockroomId });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -134,3 +116,14 @@ exports.deleteStock = (req, res, next) => {
       next(err);
     });
 };
+
+function unsetOldDefaultStockroom(stockroom) {
+  if (!stockroom || !stockroom.isDefault) return stockroom;
+  return Stockroom.findOne({ _id: { $ne: stockroom._id}, isDefault: true})
+    .then(oldDefaultStockroom => {
+      if (!oldDefaultStockroom) return stockroom;
+      oldDefaultStockroom.isDefault = false;
+      oldDefaultStockroom.save();
+      return { oldDefaultStockroom: oldDefaultStockroom, stockroom: stockroom };
+    });
+}

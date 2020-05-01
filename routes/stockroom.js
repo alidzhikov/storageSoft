@@ -1,39 +1,34 @@
 const express = require('express');
 const router = express.Router();
-const stockController = require('../controllers/stock');
+const stockroomController = require('../controllers/stockroom');
 const routeValidators = require('../services/validators');
 
 // #todo validators
 router.get(
     '/',
-    stockController.getAllStocks
+    stockroomController.getAllStockrooms
 );
 
 router.get(
-    '/productsOrdered',
-    stockController.getProductOrders
-);
-
-router.get(
-    '/:stockId',
-    stockController.getStock
+    '/:stockroomId',
+    stockroomController.getStockroom
 );
 
 router.put(
-    '/:stockId',
+    '/:stockroomId',
     //routeValidators.createStockValidator,
-    stockController.updateStock
+    stockroomController.updateStockroom
 );
 
 router.post(
     '/',
     //routeValidators.createStockValidator,
-    stockController.createStock
+    stockroomController.createStockroom
 );
 
 router.delete(
-    '/:stockId',
-    stockController.deleteStock
+    '/:stockroomId',
+    stockroomController.deleteStockroom
 );
 
 module.exports = router;
